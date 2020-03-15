@@ -8,10 +8,10 @@ This file creates your application.
 from app import app, db, login_manager
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, current_user, login_required
-from app.forms import ProfileForm
+from app.forms import LoginForm
 from app.models import UserProfile
 from werkzeug.security import check_password_hash
-from .data import get_date, format_date
+
 
 
 ###
@@ -29,49 +29,42 @@ def about():
     """Render the website's about page."""
     return render_template('about.html')
 
-
-@app.route('/profile', methods =["GET", "POST"])
+@app.route('/profile',methods = ["GET","POST"])
 def profile():
+	"""Render website's profile page"""
+	form = Profileform()
+	id = len(UserProfile.query.all())
 
-	 form = ProfileForm()
-	 id = len(UserProfile.query.all())
-	 if request.method == "POST" and form.validate_on_submit():
-			first_name = form.first_name.data
-			last_name = form.last_name.data
-			gender = form.gender.data
-			email = form.email.data
-			location = form.location.data
-			biography = form.biography.data
-			image = form.image.data
-			joined_on = form.joined_on.data
-			image_name = first_name + last_name + str(id +1)
+	if request.method =="POST" and form.validate_on_submit():
+		first_name = form.first_name.data
+		last_name = form.last_name.data
+		gender = form.gender.data
+		email = form.email.data
+		location = form.location.data
+		biography = form.biography.data
+		image = form.image.data
+		joined_on = form.joined_on.data
+		image_name = first_name +last_name + str(id+1)
 
-			
-			NewUser = UserProfile(first_name=first_name, last_name=last_name,
-     		gender=gender, email=email, location=location, biography=biography, image=image, joined_on=joined_on)
-
-			db.session.add(NewUser)
-			db.session.commit()
-
-			image.save("app/static/profilepictures/" + image_name + ".jpg")
-			flash ("New User Profile Created", successfully)
-			return redirect(url_for("profiles"))
-		
-		return render_template('profile.html', form = form)
-
-
-@app.route('/profile/<userid>')
-def userProfile(userid):
-
-	user = UserProfile.query.filter_by(id = userid).first()
-	return render_template('userprofile.html',user = user,date = format_date(user.created_on))
+		NewUser = UserProfile(first_name=first_name, last_name=last_name,gender=gender,email=email, location=location, biography=biography, image=image, joined_on=joined_on)
+		db.session.add(NewUser)
+		db.session.commit()
+		image.save("app/static/profilepictures/"+ image_name+".jpg")
+		flash("New User Profile Created", "successfully")
+		return redirect(url_for("profiles"))
+	return render_template('profile.html', form=form)
 
 
 @app.route('/profiles')
 def profiles():
 	"""Render the website's list of profiles"""
 	users = UserProfile.query.all()
-	return render_template('profiles.html',users = users)
+	return render_template("profiles.html",users=users)
+
+@app.route('/profile/<userid>')
+def userProfile(userid):
+	user=UserProfile.query.filter_by(id=userid).first()
+	return render_template('userprofile.html',user=user,date=format_date(user.created_on))
 
 
 @app.route('/secure-page')

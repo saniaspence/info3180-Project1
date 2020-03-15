@@ -1,15 +1,28 @@
-from flask_wtf import FlaskForm as Form
-from wtforms import StringField, PasswordField, SelectField,FileField
-from wtforms.validators import InputRequired,Email,DataRequired
-from flask_wtf.file import FileRequired,FileAllowed
-from wtforms.widgets import TextArea
+from flask_wtf import FlaskForm
+from wtforms import Form,StringField, TextAreaField, SelectField, FileField,FileAllowed
+from wtforms.validators import DataRequired, Email
 
+class ContactForm(FlaskForm):
+    first_name= StringField('First Name',
+                       validators=[DataRequired("Please enter your first name.")])
 
-class ProfileForm(Form):
-    first_name = StringField('First Name', validators=[InputRequired()])
-    last_name = StringField('Last Name', validators=[InputRequired()])
-    gender = SelectField('Gender',choices = [('M,Male'),('F,Female')], validators=[InputRequired()])
-    email = StringField('Email', validators = [InputRequired()])
-    location = StringField('Location', validators = [InputRequired()])
-    biography = StringField('Biography', validators = [InputRequired()])
-    image = FileField('Image', validators = [InputRequired()])
+    last_name=StringField('Last Name',
+                       validators=[DataRequired("Please enter your last name.")])
+
+    gender=SelectField('Gender', choices=[('M,Male'), ('F,Female')],
+    				validators=[DataRequired("Please enter whether male or female.")])
+
+    
+    email= StringField('Email Address',
+                        validators=[DataRequired("Please enter your email address."),Email()])
+
+    location = StringField('Location',
+    						validators=[DataRequired("Please enter your location.")])
+    
+    biography= StringField('Biography',
+                          validators=[DataRequired("Please enter your biography.")], widget=TextAreaField())
+    
+    image = FileField('Profile Picture',
+                          validators=[DataRequired("Please enter a Profile Picture."),FileAllowed(['jpg','png'], 'Images Only')])
+
+    
